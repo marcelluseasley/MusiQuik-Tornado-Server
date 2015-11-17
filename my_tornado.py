@@ -1,28 +1,12 @@
 __author__ = 'measley'
 
-import os.path
+# port = 26395
 
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from mqflasklogger import app
 
-from tornado.options import define, options
-
-define("port", default=8080, help="run on the given port", type=int)
-
-class IndexHandler(tornado.web.RequestHandler):
-
-    def get(self):
-        self.write("hello, world")
-
-if __name__ == '__main__':
-    tornado.options.parse_command_line()
-    app = tornado.web.Application(
-        [
-            (r'/', IndexHandler)
-        ],
-    )
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+http_server = HTTPServer(WSGIContainer(app))
+http_server.listen(26395)
+IOLoop.instance().start()
