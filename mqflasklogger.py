@@ -4,9 +4,11 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 # mysql://username:password@hostname/database
 # add_search, add_download, searches, downloads, add_dmca_request
+
 app = Flask(__name__)
 app.debug = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://musiquik:musiquik@localhost/musiquik'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -21,6 +23,9 @@ class Search(db.Model):
         self.query = query
         self.request_ip = request_ip
         self.searched = searched
+
+    def __repr__(self):
+        return '<Search %r>' % self.query
 
 
 class Download(db.Model):
@@ -40,6 +45,9 @@ class Download(db.Model):
         self.artist = artist
         self.direct_url = direct_url
         self.downloaded = downloaded
+
+    def __repr__(self):
+        return '<Download %r>' % self.query
 
 
 @app.route('/add_search', methods=['POST'])
