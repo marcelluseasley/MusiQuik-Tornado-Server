@@ -85,9 +85,68 @@ def searches():
 def downloads():
     pass
 
-@app.route('/getsong', methods=['POST'])
+@app.route('/getsongs', methods=['POST'])
 def getsong():
-    pass
+
+    searchTerm = request.form['query']
+    url = "http://mp3monkey.net/searchProxy.php"
+
+    tracklist = defaultdict()
+    tracklist['tracks'] = list()
+
+    headers = {"Host": getDomainName(url),
+               "Origin": getDomainName(url),
+               "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101 Firefox/38.0",
+               "Content-Type": "application/x-www-form-urlencoded",
+               "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+               "Accept-Language": "en-US,en;q=0.8",
+               "Accept-Encoding": "gzip, deflate, sdch",
+               "Upgrade-Insecure-Requests": "1",
+               "Cache-Control": "no-cache",
+               "Pragma": "no-cache",
+               "Referer": getDomainName(url),
+               "Connection": "keep-alive"}
+
+    payload = {'search': searchTerm}
+
+    resp = requests.post(url, payload, allow_redirects=True, timeout=5000.0, headers=headers)
+    resp.encoding = 'utf-8'
+
+    #print("status_code: {}".format(resp.status_code))
+    #print(resp.text)
+
+    soup = BeautifulSoup(resp.text, 'html.parser')
+
+    resultset = soup.find_all("div", class_="results")
+    songset = resultset[0].find_all("div", class_="toggle")
+
+    for songNode in songset:
+        (artist, song) = songNode.b.text.split("-", 1)
+
+        artist = artist.replace('"', '', 10)
+        song = song.replace('"', '', 10)
+        print(artist)
+        print(song)
+
+        preUrl = songNode.find_all("div", class_="floatRight")[0].find_all("a", {"rel": "nofollow"})[0]["href"]
+
+        headers2 = {"Host": getDomainName(preUrl),
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, sdch",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"}
+
+        resp2 = requests.get(preUrl, allow_redirects=True, timeout=10000.0)
+        resp2.encoding = 'utf-8'
+
+        soup2 = BeautifulSoup(resp2.text, 'html.parser')
+
+        directUrl = soup2.find_all(id="content")[0].find_all("a", class_="green")[0]["href"]
+        print(directUrl)
+        print()
+
+        tracklist["tracks"].append({"name": song, "artist": artist, "direct": directUrl})
+    tracklist = json.dumps(tracklist)
+    print(tracklist)
 
 
 # helper functions
