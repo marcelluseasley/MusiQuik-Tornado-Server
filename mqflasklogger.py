@@ -146,7 +146,7 @@ def getsong():
 
         tracklist["tracks"].append({"name": song, "artist": artist, "direct": directUrl})
     tracklist = json.dumps(tracklist)
-    print(tracklist)
+    return (tracklist, '200')
 
 
 # helper functions
