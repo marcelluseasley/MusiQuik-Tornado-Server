@@ -78,12 +78,12 @@ def add_download():
 
 @app.route('/searches', methods=['GET'])
 def searches():
-    return "lala"
+    return ("searches", 204)
 
 
 @app.route('/downloads', methods=['GET'])
 def downloads():
-    pass
+    return ("downloads", 204)
 
 @app.route('/getsongs', methods=['POST'])
 def getsong():
