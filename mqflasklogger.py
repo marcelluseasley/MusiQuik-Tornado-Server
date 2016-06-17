@@ -1,6 +1,11 @@
 from flask import Flask
 from flask import request
 from flask.ext.sqlalchemy import SQLAlchemy
+from urlparse import urlparse
+import requests
+from bs4 import BeautifulSoup
+import json
+from collections import defaultdict
 
 # mysql://username:password@hostname/database
 # add_search, add_download, searches, downloads, add_dmca_request
@@ -79,3 +84,16 @@ def searches():
 @app.route('/downloads', methods=['GET'])
 def downloads():
     pass
+
+@app.route('/getsong', methods=['POST'])
+def getsong():
+    pass
+
+
+# helper functions
+def getDomainName(url):
+    dName = urlparse(url).netloc
+    if dName.startswith('www.'):
+        dName = dName[4:]
+    return dName
+
